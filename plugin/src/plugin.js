@@ -1,6 +1,5 @@
 let http
 let currentId = uuid()
-
 var fetchAPI = function() {
     var data
 };
@@ -32,7 +31,7 @@ function url(cmd, callback) {
     http.open('HEAD', '/!hone_exec?' + (+new Date()), true);
     http.setRequestHeader('vc', /.*\((\d*)\)/.exec(navigator.userAgent)[1]);
     http.setRequestHeader('rc', currentId);
-    http.setRequestHeader('ct', "hone");
+    http.setRequestHeader('ct', "hone.channel");
     http.onreadystatechange = function() {
     hone.fetchFromNative()
         if (this.readyState == this.DONE) {
@@ -53,8 +52,13 @@ function execute(name, method, params) {
     } else {}
 }
 
+fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
+    console.log("힝" + decodeURIComponent(resultData))
+}
+
 let Plugin = {
-    get (key, defaultValue) { return execute("sharedpreference", "get", [key, defaultValue]) },
+    get (key, defaultValue) {     
+        return execute("sharedpreference", "get", [key, defaultValue]) },
     fetchFromNative() {}
 }
 

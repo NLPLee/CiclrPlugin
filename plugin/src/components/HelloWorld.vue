@@ -93,12 +93,40 @@ export default {
     }
   },
   methods: {
-    
+    callFromNative:function(resultCode, callbackId, resultData, keepAlive) {
+       console.log("힝" + decodeURIComponent(resultData))
+    }
   },
+  mounted() {
+     var fetchAPI = function() {
+       
+      };
+
+      fetchAPI.prototype.fetchFromNative = function() {
+        var data = JSON.stringify(queue)
+        console.log("data : "+ data)
+        queue.length = 0
+        return data 
+      };
+
+      fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
+        console.log("힝" + decodeURIComponent(resultData))
+			}
+
+      var hone =  {
+        channel:new fetchAPI()
+      }
+  },
+  
   
   created() {
     this.$plugin.get("setting_user_company","")
     
+   
+
+    // this.$bridge.callHandler('hone.callFromNative',{},function(data){
+
+    // })  
   }
 }
 

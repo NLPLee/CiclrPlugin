@@ -13,8 +13,11 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "stx-vue-webview-js-bridge": "0.0.8",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-bridge-webview": "^1.1.0",
+    "vue-router": "^3.0.1",
+    "vue-webview-js-bridge": "0.0.8"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

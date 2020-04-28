@@ -3,13 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    
     <title>plugin</title>
     <script>
       let queue = []
       var fetchAPI = function() {
-        var data;
+       
       };
-  
+
       fetchAPI.prototype.fetchFromNative = function() {
         var data = JSON.stringify(queue)
         console.log("data : "+ data)
@@ -21,7 +22,10 @@
         console.log("힝" + decodeURIComponent(resultData))
 			}
 
-      var hone = new fetchAPI();
+      var hone =  {
+        channel:new fetchAPI()
+      }
+      
     </script>
   </head>
  
