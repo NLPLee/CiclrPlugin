@@ -5,25 +5,23 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>plugin</title>
     <script>
-      let cmd
-      var abcd = function() {
+      let queue = []
+      var fetchAPI = function() {
         var data;
       };
   
-      abcd.prototype.fetchFromNative = function() {
-        let queue = [];
-        queue.push(cmd);
-        var data = JSON.stringify(queue[0])
+      fetchAPI.prototype.fetchFromNative = function() {
+        var data = JSON.stringify(queue)
         console.log("data : "+ data)
-        queue.length = 0; 
-        return data;
+        queue.length = 0
+        return data 
       };
 
-      abcd.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-        //alert(resultCode)
+      fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
+        console.log("힝" + decodeURIComponent(resultData))
 			}
 
-      var hone = new abcd();
+      var hone = new fetchAPI();
     </script>
   </head>
  

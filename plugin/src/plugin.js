@@ -1,17 +1,22 @@
-let http;
+let http
+let currentId = uuid()
 
-let fetchAPI = function() {
-    let data;
-}
+var fetchAPI = function() {
+    var data
+};
 
 fetchAPI.prototype.fetchFromNative = function() {
-    let queue = [];
-    queue.push(cmd);
-    var data = JSON.stringify(queue);
-    queue.length = 0; 
-    return data;
+    let data = JSON.stringify(queue)
+    console.log("data : "+ data)
+    queue.length = 0
+    return data 
+};
+
+fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
+    console.log("힝" + decodeURIComponent(resultData))
 }
-var hone = new fetchAPI()
+
+var hone = new fetchAPI();
 
 function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -20,35 +25,36 @@ function uuid() {
     });
 }
 
-function url(callback) {
+
+function url(cmd, callback) {
+    queue.push(cmd);
     http = new XMLHttpRequest();
     http.open('HEAD', '/!hone_exec?' + (+new Date()), true);
     http.setRequestHeader('vc', /.*\((\d*)\)/.exec(navigator.userAgent)[1]);
-    http.setRequestHeader('rc', uuid());
+    http.setRequestHeader('rc', currentId);
     http.setRequestHeader('ct', "hone");
     http.onreadystatechange = function() {
+    hone.fetchFromNative()
         if (this.readyState == this.DONE) {
             
         }
     };
-    http.send(null);
+    http.send();
 }
 
-function execute(name, method, params, succscee) {
+function execute(name, method, params) {
     let sParam = JSON.stringify(params)
-    cmd = [uuid(), name, method, 'N', sParam];
+    let cmd = [currentId, name, method, 'N', sParam];
     console.log("cmd : " + cmd)
     if( /Android/i.test(navigator.userAgent)) {
         window.prompt("hone://" + "hone.channel" + '/', JSON.stringify(cmd));
     } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        url(true)
+        url(JSON.stringify(cmd), true)
     } else {}
-    
-    
 }
 
 let Plugin = {
-    get (key, defaultValue) { execute("sharedpreference", "get", [key, defaultValue]) },
+    get (key, defaultValue) { return execute("sharedpreference", "get", [key, defaultValue]) },
     fetchFromNative() {}
 }
 
