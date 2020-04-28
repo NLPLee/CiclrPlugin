@@ -7,19 +7,20 @@
     <script>
       let cmd
       var abcd = function() {
-        
+        var data;
       };
   
       abcd.prototype.fetchFromNative = function() {
         let queue = [];
-        queue.push(cmd.toString());
-        var data = '["b5c8f658-7c7e-4e8b-baa3-6db0cb5d9db4","sharedpreference","get","N","[\\"setting_user_company\\",\\"\\"]"]';
+        queue.push(cmd);
+        var data = JSON.stringify(queue[0])
+        console.log("data : "+ data)
         queue.length = 0; 
         return data;
       };
 
       abcd.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-        alert(resultCode)
+        //alert(resultCode)
 			}
 
       var hone = new abcd();

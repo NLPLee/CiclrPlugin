@@ -1,16 +1,17 @@
+let http;
 
-// let fetchAPI = function() {
-//     let data;
-// }
+let fetchAPI = function() {
+    let data;
+}
 
-// fetchAPI.prototype.fetchFromNative = function() {
-//     let queue = [];
-//     queue.push(cmd.toString());
-//     var data = JSON.stringify(queue);
-//     queue.length = 0; 
-//     return data;
-// }
-//var hone = new fetchAPI()
+fetchAPI.prototype.fetchFromNative = function() {
+    let queue = [];
+    queue.push(cmd);
+    var data = JSON.stringify(queue);
+    queue.length = 0; 
+    return data;
+}
+var hone = new fetchAPI()
 
 function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -20,7 +21,7 @@ function uuid() {
 }
 
 function url(callback) {
-    let http = new XMLHttpRequest();
+    http = new XMLHttpRequest();
     http.open('HEAD', '/!hone_exec?' + (+new Date()), true);
     http.setRequestHeader('vc', /.*\((\d*)\)/.exec(navigator.userAgent)[1]);
     http.setRequestHeader('rc', uuid());
@@ -30,13 +31,13 @@ function url(callback) {
             
         }
     };
-    http.send();
+    http.send(null);
 }
 
 function execute(name, method, params, succscee) {
     let sParam = JSON.stringify(params)
     cmd = [uuid(), name, method, 'N', sParam];
-
+    console.log("cmd : " + cmd)
     if( /Android/i.test(navigator.userAgent)) {
         window.prompt("hone://" + "hone.channel" + '/', JSON.stringify(cmd));
     } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
