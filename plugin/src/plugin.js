@@ -1,11 +1,15 @@
+import { Observable } from 'rxjs';
 let http
-let currentId = uuid()
-var fetchAPI = function() {
-    var data
+const currentId = uuid()
+let queue = []
+let a;
+
+let fetchAPI = function() {
+    
 };
 
 fetchAPI.prototype.fetchFromNative = function() {
-    let data = JSON.stringify(queue)
+    var data = JSON.stringify(queue)
     console.log("data : "+ data)
     queue.length = 0
     return data 
@@ -15,15 +19,17 @@ fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData,
     console.log("힝" + decodeURIComponent(resultData))
 }
 
-var hone = new fetchAPI();
+let hone =  {
+    channel:new fetchAPI()
+}
+window["hone"] = hone
 
 function uuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        let r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
     });
 }
-
 
 function url(cmd, callback) {
     queue.push(cmd);
@@ -53,13 +59,28 @@ function execute(name, method, params) {
 }
 
 fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-    console.log("힝" + decodeURIComponent(resultData))
+    
+    a = decodeURIComponent(resultData);
+    
+    console.log("callFromNative" + decodeURIComponent(resultData))
 }
 
 let Plugin = {
-    get (key, defaultValue) {     
-        return execute("sharedpreference", "get", [key, defaultValue]) },
-    fetchFromNative() {}
+    get (key, defaultValue, callback) {     
+
+        const observable = new Observable(subscriber => {
+            subscriber.next(1);
+            subscriber.next(2);
+            subscriber.next(3);
+            setTimeout(() => {
+              subscriber.next(4);
+              subscriber.complete();
+            }, 1000);
+        });
+        
+        execute("sharedpreference", "get", [key, defaultValue]) 
+        callback(a)
+    }
 }
 
 export default Plugin

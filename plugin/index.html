@@ -5,28 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     
     <title>plugin</title>
-    <script>
-      let queue = []
-      var fetchAPI = function() {
-       
-      };
-
-      fetchAPI.prototype.fetchFromNative = function() {
-        var data = JSON.stringify(queue)
-        console.log("data : "+ data)
-        queue.length = 0
-        return data 
-      };
-
-      fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-        console.log("힝" + decodeURIComponent(resultData))
-			}
-
-      var hone =  {
-        channel:new fetchAPI()
-      }
-      
-    </script>
+   
   </head>
  
   <body>
