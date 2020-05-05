@@ -1,22 +1,15 @@
-import { Observable } from 'rxjs';
+import { rx } from 'rxjs';
 let http
-const currentId = uuid()
+let result = {}
 let queue = []
-let a;
 
-let fetchAPI = function() {
-    
-};
+let fetchAPI = () => {}
 
-fetchAPI.prototype.fetchFromNative = function() {
+fetchAPI.prototype.fetchFromNative = () => {
     var data = JSON.stringify(queue)
     console.log("data : "+ data)
     queue.length = 0
     return data 
-};
-
-fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-    console.log("힝" + decodeURIComponent(resultData))
 }
 
 let hone =  {
@@ -36,7 +29,7 @@ function url(cmd, callback) {
     http = new XMLHttpRequest();
     http.open('HEAD', '/!hone_exec?' + (+new Date()), true);
     http.setRequestHeader('vc', /.*\((\d*)\)/.exec(navigator.userAgent)[1]);
-    http.setRequestHeader('rc', currentId);
+    http.setRequestHeader('rc', uuid());
     http.setRequestHeader('ct', "hone.channel");
     http.onreadystatechange = function() {
     hone.fetchFromNative()
@@ -47,9 +40,19 @@ function url(cmd, callback) {
     http.send();
 }
 
-function execute(name, method, params) {
+fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
+    console.log(`callFromNative${keepAlive}`)
+    console.log(callbackId)
+
+    console.log(result)
+    result[callbackId] = decodeURIComponent(resultData);
+}
+
+function execute(name, method, params, currentId) {
     let sParam = JSON.stringify(params)
+    
     let cmd = [currentId, name, method, 'N', sParam];
+    result[currentId] = null
     console.log("cmd : " + cmd)
     if( /Android/i.test(navigator.userAgent)) {
         window.prompt("hone://" + "hone.channel" + '/', JSON.stringify(cmd));
@@ -57,30 +60,32 @@ function execute(name, method, params) {
         url(JSON.stringify(cmd), true)
     } else {}
 }
-
-fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
-    
-    a = decodeURIComponent(resultData);
-    
-    console.log("callFromNative" + decodeURIComponent(resultData))
-}
-
+var myVar;
 let Plugin = {
     get (key, defaultValue, callback) {     
-
-        const observable = new Observable(subscriber => {
-            subscriber.next(1);
-            subscriber.next(2);
-            subscriber.next(3);
-            setTimeout(() => {
-              subscriber.next(4);
-              subscriber.complete();
-            }, 1000);
-        });
-        
-        execute("sharedpreference", "get", [key, defaultValue]) 
-        callback(a)
+        let currentId = uuid()
+        execute("sharedpreference", "get", [key, defaultValue], currentId)
+        let loop = setInterval(function() {
+            if(result != null) {
+                callback(result[currentId])
+                delete result[currentId];
+                clearInterval(loop)
+            }
+        }, 0)
+    },
+    set (key, defaultValue, callback) {
+        let currentId = uuid()
+        execute("sharedpreference", "set", [key, defaultValue], currentId)
+        let loop = setInterval(function() {
+            if(result != null) {
+                callback(result[currentId])
+                delete result[currentId];
+                clearInterval(loop)
+            }
+        }, 0)
     }
 }
+
+
 
 export default Plugin

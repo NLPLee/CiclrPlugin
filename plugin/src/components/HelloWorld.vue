@@ -105,6 +105,15 @@ export default {
     this.$plugin.get("setting_user_company","", function(s) {
       console.log("힝" + s)
     });
+
+    this.$plugin.set("toast22","11", function(s) {
+      console.log("힝1" + s)
+    });
+
+    this.$plugin.get("toast22","", function(s) {
+      console.log("힝2" + s)
+    });
+    
     
    
 
