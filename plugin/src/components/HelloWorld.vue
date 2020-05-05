@@ -89,7 +89,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'hihi'
+      msg: 'plugin TEST'
     }
   },
   methods: {
@@ -102,29 +102,27 @@ export default {
   
   created() {
     
-    this.$plugin.get("setting_user_company","", function(s) {
-      console.log("힝" + s)
-    });
+    this.$plugin.get("setting_user_company","", (data) => {
+      console.log(`setting_user_company : ${data}`)
+    })
 
-    this.$plugin.set("toast22","11", function(s) {
-      console.log("힝1" + s)
-    });
+    this.$plugin.set("addTest","add", (data) => {
+      console.log(`sharedpreferece add result : ${data}`)
+    })
 
-    this.$plugin.get("toast22","", function(s) {
-      console.log("힝2" + s)
-    });
-    
-    
-   
+    this.$plugin.get("addTest","", (data) => {
+      console.log(`addTest : ${data}`)
+    })
 
-    // this.$bridge.callHandler('hone.callFromNative',{},function(data){
+    this.$plugin.ui.toast("TOAST", during.long)
 
-    // })  
+    this.$plugin.ui.showDateTimePicker("2019","09","09","22","31", (date) => {
+      console.log(`showDatePicker result : ${date}`)
+    })
   }
 }
 
     
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
