@@ -4,6 +4,7 @@ let queue = []
 let during = { short: "short", long: "long"}; // toast 시간
 let fetchAPI = () => {}
 let nativeUI = () => {}
+let gCallback = null
 
 let hone =  {
     channel:new fetchAPI()
@@ -24,11 +25,24 @@ fetchAPI.prototype.fetchFromNative = () => {
 
 /**
  * 네이티브에서 진행 된 로직을 수행한 후, callFromNative함수를 호출하여 결과 데이터 전송
+ * Promise로 대기 후, 데이터 수신이 되면 Callback으로 전달
  */
 fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData, keepAlive) {
     result[callbackId] = decodeURIComponent(resultData);
+
+    if(gCallback != null) {
+        new Promise((resolve) => {
+            resolve(result);
+        }).then((promise) => {
+            if(promise != undefined) {
+                gCallback(promise[callbackId])
+                delete result[callbackId]
+            }
+        });
+    }
 }
 
+// MARK : UI Plugin
 
 /**
  * toast 메시지 출력
@@ -37,13 +51,7 @@ fetchAPI.prototype.callFromNative = function(resultCode, callbackId, resultData,
  */
 nativeUI.prototype.toast = (message, during, callback) => {
     let callbackId = uuid()
-    
-    execute("ui", "toast", [message, during], callbackId)
-    if(callback != null) {
-        fLoop(callbackId, callback)
-    } else {
-        delete result[callbackId];
-    }
+    execute("ui", "toast", [message, during], callbackId, callback)
 }
 
 /**
@@ -56,12 +64,7 @@ nativeUI.prototype.toast = (message, during, callback) => {
  */
 nativeUI.prototype.showDateTimePicker = (year, month, day, hour, min, callback) => {
     let callbackId = uuid()
-    execute("ui", "showDatePicker", ['yMdhm', year, month, day, hour, min], callbackId)
-    if(callback != null) {
-        fLoop(callbackId, callback)
-    } else {
-        delete result[callbackId];
-    }
+    execute("ui", "showDatePicker", ['yMdhm', year, month, day, hour, min], callbackId, callbackId)
 }
 
 // MARK : Function
@@ -76,7 +79,6 @@ function uuid() {
     });
 }
 
-
 /**
  * iOS에서 처리하기 위한 xhr 요청 함수
  * @param {*} cmd 명령어 json 으로 전송
@@ -89,27 +91,11 @@ function url(cmd) {
     http.setRequestHeader('rc', uuid());
     http.setRequestHeader('ct', "hone.channel");
     http.onreadystatechange = function() {
-    hone.fetchFromNative()
         if (this.readyState == this.DONE) {
             
         }
     };
     http.send();
-}
-
- /**
-  * 차후, rxjs 또는 Promise, callback으로 처리되어야함 (머리가 굳어서 setInterval로 처리)
-  * @param {String} callbackId callbackID로 처리된 result를 callback 으로 넘긴 후, 제거
-  * @param {*} callback 
-  */
-function fLoop(callbackId, callback) {
-    let loop = setInterval(() => {
-        if(result[callbackId] != null) {
-            callback(result[callbackId])
-            delete result[callbackId];
-            clearInterval(loop)
-        }
-    }, 0)
 }
 
 /**
@@ -119,13 +105,15 @@ function fLoop(callbackId, callback) {
  * @param {Array} params 플러그인 종류에 따른 파라미터를 배열로 전달
  * @param {String} callbackId callbackID
  */
-function execute(name, method, params, callbackId) {
+function execute(name, method, params, callbackId, callback) {
+    
     let sParam = JSON.stringify(params)
     let cmd = [callbackId, name, method, 'N', sParam];
     result[callbackId] = null
     if( /Android/i.test(navigator.userAgent)) {
         window.prompt("hone://" + "hone.channel" + '/', JSON.stringify(cmd));
     } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        gCallback = callback
         url(JSON.stringify(cmd))
     } else {}
 }
@@ -134,13 +122,11 @@ function execute(name, method, params, callbackId) {
 let Plugin = {
     get(key, defaultValue, callback) {     
         let callbackId = uuid()
-        execute("sharedpreference", "get", [key, defaultValue], callbackId)
-        fLoop(callbackId, callback)
+        execute("sharedpreference", "get", [key, defaultValue], callbackId, callback)
     },
     set(key, defaultValue, callback) {
         let callbackId = uuid()
-        execute("sharedpreference", "set", [key, defaultValue], callbackId)
-        fLoop(callbackId, callback)
+        execute("sharedpreference", "set", [key, defaultValue], callbackId, callback)
     },
     ui: new nativeUI()
 }
